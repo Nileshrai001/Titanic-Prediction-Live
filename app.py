@@ -2,23 +2,27 @@ import streamlit as st
 import pickle
 import numpy as np
 
-# Model load karna
-with open('titanic.pkl', 'rb') as f:
+with open("titanic.pkl", "rb") as f:
     model = pickle.load(f)
 
 st.title("Titanic Survival Prediction")
 
-pclass = st.selectbox("Passenger Class", [1, 2, 3])
-sex = st.selectbox("Gender", ["Male", "Female"])
-age = st.slider("Age", 0, 80, 25)
-fare = st.number_input("Fare", 0, 500, 30)
+pclass = st.selectbox("Passenger Class(1 = 1st, 2 = 2nd, 3 = 3rd)", [1, 2, 3])
+sex = st.selectbox("Sex", ["male", "female"])
+age = st.number_input("Age", 2, 80, 15)
+sibsp = st.number_input("Number of Siblings", 0, 10, 0)
+parch = st.number_input("Number of Parents", 0, 10, 0)
+fare = st.number_input("Fare", 0.0, 600.0, 30.0)
+embarked = st.selectbox("Port of Embarkation", ["C", "Q", "S"])
 
-gender = 0 if sex == "Male" else 1
-input_data = np.array([[pclass, gender, age, fare]])
+sex_num = 1 if sex == "male" else 0
+embarked_dict = {"C": 0, "Q": 1, "S": 2}
+embarked_num = embarked_dict[embarked]
+input_data = np.array([[pclass, sex_num, age, sibsp, parch, fare, embarked_num]])
 
 if st.button("Predict"):
-    prediction = model.predict(input_data)
-    if prediction[0] == 1:
-        st.success("Likely to Survive")
+    result = model.predict(input_data)
+    if result[0] == 1:
+        st.success("The passenger is likely to survive.")
     else:
-        st.error("Unlikely to Survive")
+        st.error("The passenger is unlikely to survive.")
